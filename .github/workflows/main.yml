@@ -39,9 +39,9 @@ jobs:
     steps:
       - name: Set up SSH Agent
         run: |
-          echo "SSH_PRIVATE_KEY" > private.key
+          echo "$SSH_PRIVATE_KEY" > private.key
           sudo chmod 400 private.key
-          eval "s(ssh-agent -s)"
+          eval "$(ssh-agent -s)"
           ssh-add private.key
           mkdir -p ~/.ssh
           touch ~/.ssh/known_hosts

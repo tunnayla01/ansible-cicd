@@ -86,7 +86,6 @@
         src: "/etc/nginx/sites-available/{{ DOMAIN_NAME }}"
         dest: "/etc/nginx/sites-enabled/{{ DOMAIN_NAME }}"
         state: link
-      when: not nginx_site_config.stat.exists
       notify: 
         - Reload Nginx
 
@@ -98,4 +97,12 @@
     - name: Restart Nuxt.js Container
       docker_container:
         name: "{{ CONTAINER_NAME }}"
+        state: restarted
+
+    - name: Flush handlers
+      meta: flush_handlers
+
+    - name: Restart Nginx forcefully
+      service:
+        name: nginx
         state: restarted

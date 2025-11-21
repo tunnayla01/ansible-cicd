@@ -1,0 +1,24 @@
+name: Build and Deploy Nuxt.js App with Ansible to Remote Server
+
+env: 
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+  SSH_USER: ${{ vars.SSH_USER }}
+  TARGET_HOST: ${{ vars.SSH_HOST }}
+  IMAGE_NAME: ${{ vars.IMAGE_NAME }}
+  CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
+  DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+
+  on: 
+    push:
+      branches:
+        - master
+
+  jobs:
+      build-and-deploy:
+        runs-on: ubuntu-latest
+
+        
+

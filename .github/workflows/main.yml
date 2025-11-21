@@ -63,5 +63,5 @@ jobs:
             --extra-vars "docker_token=$DOCKER_TOKEN" \
             --extra-vars "image_name=$CONTAINER_NAME" \
             --extra-vars "domain_name=$DOMAIN_NAME" \
-            devops/playbook.yml  
+            ansible-cicd/devops/playbook.yml  
 

@@ -95,3 +95,7 @@
       service:
         name: nginx
         state: reloaded
+    - name: Restart Nuxt.js Container
+      docker_container:
+        name: "{{ CONTAINER_NAME }}"
+        state: restarted

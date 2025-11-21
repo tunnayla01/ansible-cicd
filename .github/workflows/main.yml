@@ -37,6 +37,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up SSH Agent
         run: |
           echo "$SSH_PRIVATE_KEY" > private.key
@@ -63,5 +66,5 @@ jobs:
             --extra-vars "docker_token=$DOCKER_TOKEN" \
             --extra-vars "image_name=$CONTAINER_NAME" \
             --extra-vars "domain_name=$DOMAIN_NAME" \
-            ansible-cicd/devops/playbook.yml  
+            devops/playbook.yml  
 

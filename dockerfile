@@ -1,22 +1,18 @@
 FROM node:20-alpine
 
+LABEL maintainer="Soe Thura <thixpin@gmail.com>"
+LABEL description="A simple web server to serve static files built with Node.js and Express."
+
 WORKDIR /app
 
-# Enable corepack (ships with Node 20)
-RUN corepack enable
+COPY package.json package-lock.json ./
 
-# Copy only manifest files first
-COPY package.json pnpm-lock.yaml ./
+RUN npm install 
 
-# Install dependencies using the pnpm version specified in the lockfile
-RUN corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile
-
-# Copy project files
 COPY . .
 
-# Build
-RUN pnpm build
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]

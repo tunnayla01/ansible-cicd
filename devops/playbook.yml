@@ -11,9 +11,22 @@
     DOMAIN_NAME: "{{ domain_name }}"
 
   tasks:
+    # --- FIX 1: Prerequisites for Ansible Docker Modules ---
+    # Ansible needs Python's docker library to run docker_login, docker_image, etc.
+    - name: Install Python pip
+      apt:
+        name: python3-pip
+        state: present
+        update_cache: yes
+
+    - name: Install Docker Python SDK
+      pip:
+        name: docker
+        state: present
+
+    # --- Docker Installation ---
     - name: Install Docker
       apt:
-        update_cache: yes
         name: docker.io
         state: present
 
@@ -23,6 +36,7 @@
         state: started
         enabled: yes
 
+    # --- Nginx Installation ---
     - name: Install Nginx
       apt:
         name: nginx
@@ -34,27 +48,33 @@
         state: started
         enabled: yes
 
+    # --- Docker Operations ---
     - name: Login to Docker Hub
-      docker_login:
+      community.docker.docker_login:
         username: "{{ DOCKERHUB_USER }}"
         password: "{{ DOCKERHUB_TOKEN }}"
 
-    - name: Pull Nuxt.js Docker DOCKER_IMAGE
-      DOCKER_IMAGE: 
+    # --- FIX 2: Fixed invalid module name 'DOCKER_IMAGE' ---
+    - name: Pull Nuxt.js Docker Image
+      community.docker.docker_image:
         name: "{{ DOCKER_IMAGE }}"
-        source: Pull
+        source: pull
+        force_source: yes
 
     - name: Run Nuxt.js Docker Container
-      docker_container:
+      community.docker.docker_container:
         name: "{{ CONTAINER_NAME }}"
         image: "{{ DOCKER_IMAGE }}"
         ports: 
           - "3001:3000"
         state: started
         restart_policy: always
+        pull: yes # Ensures we use the new image we just pulled
     
+    # --- Nginx Configuration ---
+    # --- FIX 3: Fixed typo 'stats' -> 'stat' ---
     - name: Check if Nginx site configuration exists
-      stats: 
+      stat: 
         path: "/etc/nginx/sites-available/{{ DOMAIN_NAME }}"
       register: nginx_site_config
 
@@ -64,10 +84,13 @@
         dest: "/etc/nginx/sites-available/{{ DOMAIN_NAME }}"
       when: not nginx_site_config.stat.exists
 
+    # --- FIX 4: Fixed Symlink Destination ---
+    # You were linking sites-available to sites-available.
+    # It must link to sites-enabled to actually work.
     - name: Enable Nginx site configuration
       file:
         src: "/etc/nginx/sites-available/{{ DOMAIN_NAME }}"
-        dest: "/etc/nginx/sites-available/{{ DOMAIN_NAME }}"
+        dest: "/etc/nginx/sites-enabled/{{ DOMAIN_NAME }}"
         state: link
       when: not nginx_site_config.stat.exists
       notify: 
@@ -78,4 +101,3 @@
       service:
         name: nginx
         state: reloaded
-

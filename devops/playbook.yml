@@ -13,18 +13,12 @@
   tasks:
     # --- FIX 1: Prerequisites for Ansible Docker Modules ---
     # Ansible needs Python's docker library to run docker_login, docker_image, etc.
-    - name: Install Python pip
+    - name: Install Docker Python SDK (System Package)
       apt:
-        name: python3-pip
+        name: python3-docker
         state: present
         update_cache: yes
 
-    - name: Install Docker Python SDK
-      pip:
-        name: docker
-        state: present
-
-    # --- Docker Installation ---
     - name: Install Docker
       apt:
         name: docker.io
